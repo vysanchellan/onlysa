@@ -1,5 +1,4 @@
 const CACHE_NAME = 'onlysa-v1';
-const OFFLINE_URL = '/offline';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

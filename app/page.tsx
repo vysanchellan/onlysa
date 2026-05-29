@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/ui/navbar";
 import { PostCard } from "@/components/ui/post-card";
@@ -18,31 +18,56 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("recent");
   const [area, setArea] = useState<Area>("All SA");
-
-  const fetchPosts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/posts?tab=${tab}&area=${encodeURIComponent(area)}`);
-      if (res.ok) {
-        const data = await res.json();
-        setPosts(data.posts);
-      }
-    } catch {
-      // handle error
-    } finally {
-      setLoading(false);
-    }
-  }, [tab, area]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    let cancelled = false;
+
+    async function fetchPosts() {
+      try {
+        const res = await fetch(`/api/posts?tab=${tab}&area=${encodeURIComponent(area)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled) {
+            setPosts(data.posts);
+          }
+        }
+      } catch {
+        // handle error
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void fetchPosts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [tab, area, refreshKey]);
+
+  const handleAreaChange = (nextArea: Area) => {
+    setLoading(true);
+    setArea(nextArea);
+  };
+
+  const handleTabChange = (nextTab: Tab) => {
+    setLoading(true);
+    setTab(nextTab);
+  };
+
+  const handleRefresh = () => {
+    setLoading(true);
+    setRefreshKey((current) => current + 1);
+  };
 
   const quickAreas: Area[] = ["Umhlanga", "Durban CBD", "Johannesburg", "Cape Town", "Westville"];
 
   return (
     <div className="min-h-screen bg-bg">
-      <Navbar selectedArea={area} onAreaChange={setArea} />
+      <Navbar selectedArea={area} onAreaChange={handleAreaChange} />
 
       <main className="max-w-2xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
         {area === "All SA" && tab === "recent" && !loading && (
@@ -55,7 +80,7 @@ export default function HomePage() {
             {quickAreas.map((a) => (
               <button
                 key={a}
-                onClick={() => setArea(a)}
+                onClick={() => handleAreaChange(a)}
                 className="shrink-0 px-2.5 py-1 rounded-full text-[11px] font-mono border border-border text-text-muted hover:border-accent-red/40 hover:text-accent-red transition-all"
               >
                 {a}
@@ -65,7 +90,7 @@ export default function HomePage() {
         </div>
 
         <div className="mb-4">
-          <FeedTabs activeTab={tab} onTabChange={setTab} />
+          <FeedTabs activeTab={tab} onTabChange={handleTabChange} />
         </div>
 
         {area !== "All SA" && (
@@ -74,7 +99,7 @@ export default function HomePage() {
               Showing: <span className="text-text-primary">{area}</span>
             </h2>
             <button
-              onClick={() => setArea("All SA")}
+              onClick={() => handleAreaChange("All SA")}
               className="text-[11px] font-mono text-accent-red hover:underline"
             >
               Clear filter
@@ -99,7 +124,7 @@ export default function HomePage() {
         {!loading && posts.length > 0 && (
           <div className="text-center py-8">
             <p className="text-[12px] font-mono text-text-muted">
-              All caught up. <span className="text-accent-red cursor-pointer hover:underline" onClick={fetchPosts}>Refresh</span>
+              All caught up. <span className="text-accent-red cursor-pointer hover:underline" onClick={handleRefresh}>Refresh</span>
             </p>
           </div>
         )}

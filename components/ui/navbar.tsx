@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ChevronDown, PenLine, Menu, X } from "lucide-react";
 import { AREAS, type Area } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,6 @@ interface NavProps {
 export function Navbar({ selectedArea = "All SA", onAreaChange }: NavProps) {
   const [areaOpen, setAreaOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const router = useRouter();
 
   const handleAreaSelect = (area: Area) => {
     onAreaChange?.(area);

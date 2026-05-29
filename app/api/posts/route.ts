@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAllPosts, getTrendingPosts, getPostsByArea, createPost } from "@/lib/store";
+import { getTrendingPosts, getPostsByArea, createPost } from "@/lib/store";
 import { getRandomIdentity } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
