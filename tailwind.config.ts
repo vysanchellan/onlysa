@@ -1,9 +1,6 @@
 // tailwind.config.ts
-// NOTE: Tailwind v4 does not read this file for theme tokens —
-// those are now declared via @theme {} in globals.css.
-// This file is kept only as a reference / if you ever downgrade to v3.
-// You can safely DELETE this file from your project.
-
+// Tailwind v4: theme tokens live in @theme{} in globals.css — not here.
+// This file only tells Tailwind where to scan for class names.
 import type { Config } from "tailwindcss";
 
 const config: Config = {
