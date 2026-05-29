@@ -10,15 +10,15 @@ type PostState = "idle" | "reviewing" | "success" | "error";
 
 export default function PostPage() {
   const router = useRouter();
-  const [area, setArea] = useState("");
+  const [area, setArea]         = useState("");
   const [category, setCategory] = useState("");
-  const [content, setContent] = useState("");
-  const [state, setState] = useState<PostState>("idle");
+  const [content, setContent]   = useState("");
+  const [state, setState]       = useState<PostState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const maxChars = 500;
+  const maxChars  = 500;
   const remaining = maxChars - content.length;
-  const isValid = area && category && content.trim().length >= 10;
+  const isValid   = area && category && content.trim().length >= 10;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +26,6 @@ export default function PostPage() {
 
     setState("reviewing");
     setErrorMsg("");
-
     const sessionToken = getSessionToken();
 
     try {
@@ -44,9 +43,7 @@ export default function PostPage() {
           setErrorMsg(modResult.reason || "Post flagged. Please review community guidelines.");
           return;
         }
-        if (modResult.category_suggestion) {
-          setCategory(modResult.category_suggestion);
-        }
+        if (modResult.category_suggestion) setCategory(modResult.category_suggestion);
       }
 
       // Step 2: Post
@@ -69,17 +66,13 @@ export default function PostPage() {
     }
   }
 
-  if (state === "success") {
-    return <SuccessScreen />;
-  }
-
-  if (state === "error") {
-    return <ErrorScreen message={errorMsg} onRetry={() => setState("idle")} />;
-  }
+  if (state === "success") return <SuccessScreen />;
+  if (state === "error")   return <ErrorScreen message={errorMsg} onRetry={() => setState("idle")} />;
 
   return (
     <div className="min-h-screen bg-bg">
-      {/* Header */}
+
+      {/* ── Navbar ── */}
       <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/60">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
           <Link
@@ -88,16 +81,18 @@ export default function PostPage() {
           >
             <ArrowLeft size={18} />
           </Link>
-          <span className="text-base font-display tracking-wider">
+          <span className="text-base font-display tracking-wider text-text-primary">
             Only<span className="text-accent-red">SA</span>
           </span>
-          <span className="text-text-muted text-sm">/ Post</span>
+          <span className="text-text-muted text-sm font-mono">/ Post</span>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
-        <div className="mb-8 mt-2">
-          <h1 className="text-4xl sm:text-5xl font-display text-text-primary tracking-wide mb-2">
+      <main className="max-w-2xl mx-auto px-4 pt-24 pb-24 sm:pb-12">
+
+        {/* ── Page heading ── */}
+        <div className="mb-8">
+          <h1 className="text-5xl sm:text-6xl font-display text-text-primary tracking-wide mb-2">
             Say Something
           </h1>
           <p className="text-text-secondary text-sm leading-relaxed">
@@ -105,11 +100,13 @@ export default function PostPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ── Form ── */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+
           {/* Area */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-mono text-text-muted uppercase tracking-wider block">
-              Your Area *
+          <div className="space-y-3">
+            <label className="text-[11px] font-mono text-text-muted uppercase tracking-widest block">
+              Your Area <span className="text-accent-red">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {AREAS.filter((a) => a !== "All SA").map((a) => (
@@ -121,7 +118,7 @@ export default function PostPage() {
                     "px-3 py-1.5 rounded-lg text-xs font-mono border transition-all",
                     area === a
                       ? "border-accent-red text-accent-red bg-accent-red/10"
-                      : "border-border text-text-muted hover:border-[#333] hover:text-text-secondary"
+                      : "border-border text-text-muted bg-bg-elevated hover:border-[#333] hover:text-text-secondary"
                   )}
                 >
                   {a}
@@ -131,9 +128,9 @@ export default function PostPage() {
           </div>
 
           {/* Category */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-mono text-text-muted uppercase tracking-wider block">
-              Category *
+          <div className="space-y-3">
+            <label className="text-[11px] font-mono text-text-muted uppercase tracking-widest block">
+              Category <span className="text-accent-red">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {CATEGORIES.map((cat) => (
@@ -145,7 +142,7 @@ export default function PostPage() {
                     "px-3 py-1.5 rounded-lg text-xs font-mono border transition-all",
                     category === cat
                       ? "border-accent-red text-accent-red bg-accent-red/10"
-                      : "border-border text-text-muted hover:border-[#333] hover:text-text-secondary"
+                      : "border-border text-text-muted bg-bg-elevated hover:border-[#333] hover:text-text-secondary"
                   )}
                 >
                   {cat}
@@ -154,20 +151,20 @@ export default function PostPage() {
             </div>
           </div>
 
-          {/* Content */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-mono text-text-muted uppercase tracking-wider block">
-              Your Post *
+          {/* Content textarea */}
+          <div className="space-y-3">
+            <label className="text-[11px] font-mono text-text-muted uppercase tracking-widest block">
+              Your Post <span className="text-accent-red">*</span>
             </label>
             <div className="relative">
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value.slice(0, maxChars))}
-                placeholder="What&apos;s on your mind? This is your space. Be real."
+                placeholder="What's on your mind? This is your space. Be real."
                 rows={6}
                 className={cn(
                   "w-full bg-bg-card border rounded-xl px-4 py-3 text-text-primary placeholder:text-text-muted/50 text-sm leading-relaxed resize-none transition-colors",
-                  "focus:outline-none focus:border-accent-red/50 focus:ring-0",
+                  "focus:outline-none focus:border-accent-red/50",
                   content.length > maxChars * 0.9
                     ? "border-accent-orange/50"
                     : "border-border hover:border-[#2a2a2a]"
@@ -175,7 +172,9 @@ export default function PostPage() {
               />
               <div className={cn(
                 "absolute bottom-3 right-3 text-[11px] font-mono transition-colors",
-                remaining < 50 ? "text-accent-orange" : remaining < 20 ? "text-accent-red" : "text-text-muted"
+                remaining < 50
+                  ? remaining < 20 ? "text-accent-red" : "text-accent-orange"
+                  : "text-text-muted"
               )}>
                 {remaining}
               </div>
@@ -183,10 +182,11 @@ export default function PostPage() {
           </div>
 
           {/* Privacy note */}
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-bg-elevated border border-border/60">
+          <div className="flex items-start gap-3 p-4 rounded-xl bg-bg-elevated border border-border/60">
             <div className="w-1.5 h-1.5 rounded-full bg-accent-green mt-1.5 shrink-0" />
             <p className="text-[12px] text-text-muted leading-relaxed font-mono">
-              Your identity is never stored. A random label like &quot;Durban Local&quot; is assigned automatically. All posts are reviewed before publishing.
+              Your identity is never stored. A random label like &ldquo;Durban Local&rdquo; is assigned
+              automatically. All posts are reviewed before publishing.
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function PostPage() {
               "w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-semibold transition-all",
               isValid
                 ? "bg-accent-red text-white hover:bg-accent-red/90 shadow-lg shadow-accent-red/20 active:scale-[0.99]"
-                : "bg-bg-elevated text-text-muted cursor-not-allowed"
+                : "bg-bg-elevated text-text-muted cursor-not-allowed border border-border"
             )}
           >
             {state === "reviewing" ? (
@@ -226,7 +226,7 @@ function SuccessScreen() {
         <div className="w-16 h-16 rounded-full bg-accent-green/10 border border-accent-green/30 flex items-center justify-center mx-auto mb-6">
           <CheckCircle size={32} className="text-accent-green" />
         </div>
-        <h2 className="text-3xl font-display text-text-primary mb-3 tracking-wide">
+        <h2 className="text-4xl font-display text-text-primary mb-3 tracking-wide">
           It&apos;s Live
         </h2>
         <p className="text-text-secondary text-sm leading-relaxed">
@@ -247,7 +247,7 @@ function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => voi
         <div className="w-16 h-16 rounded-full bg-accent-red/10 border border-accent-red/30 flex items-center justify-center mx-auto mb-6">
           <XCircle size={32} className="text-accent-red" />
         </div>
-        <h2 className="text-3xl font-display text-text-primary mb-3 tracking-wide">
+        <h2 className="text-4xl font-display text-text-primary mb-3 tracking-wide">
           Post Flagged
         </h2>
         <p className="text-text-secondary text-sm leading-relaxed mb-6">
