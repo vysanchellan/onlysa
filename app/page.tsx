@@ -77,7 +77,7 @@ export default function HomePage() {
 
       <main className="max-w-6xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_340px] lg:items-start">
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             {area === "All SA" && tab === "recent" && !loading && (
               <HeroBanner topArea={topArea} totalPosts={posts.length} />
             )}
@@ -122,17 +122,32 @@ export default function HomePage() {
             ) : posts.length === 0 ? (
               <EmptyFeed />
             ) : (
-              <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-2">
-                {visiblePosts.map((post, i) => (
-                  <Link
-                    key={post.id}
-                    href={`/post/${post.id}`}
-                    className="block h-full"
-                    style={{ animation: `fadeUp 0.5s ease ${i * 0.04}s forwards`, opacity: 0 }}
-                  >
-                    <PostCard post={post} className="h-full" />
-                  </Link>
-                ))}
+              <div className="space-y-4">
+                <div className="rounded-3xl border border-border/60 bg-bg-card/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <p className="text-[11px] font-mono uppercase tracking-[0.24em] text-text-muted">Featured now</p>
+                      <p className="text-sm text-text-secondary">The first post in the current feed</p>
+                    </div>
+                    <Link href={`/post/${visiblePosts[0].id}`} className="text-[11px] font-mono text-accent-red hover:underline">
+                      Open post
+                    </Link>
+                  </div>
+                  <PostCard post={visiblePosts[0]} className="border-border/80 bg-bg-secondary" />
+                </div>
+
+                <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-2">
+                  {visiblePosts.slice(1).map((post, i) => (
+                    <Link
+                      key={post.id}
+                      href={`/post/${post.id}`}
+                      className="block h-full"
+                      style={{ animation: `fadeUp 0.5s ease ${i * 0.04}s forwards`, opacity: 0 }}
+                    >
+                      <PostCard post={post} className="h-full" />
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -145,7 +160,7 @@ export default function HomePage() {
             )}
           </section>
 
-          <aside className="space-y-4 lg:sticky lg:top-20">
+          <aside className="min-w-0 space-y-4 lg:sticky lg:top-20">
             <div className="rounded-2xl border border-border/60 bg-bg-card p-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.24em] text-text-muted mb-3">
                 Live pulse
@@ -207,7 +222,7 @@ function HeroBanner({ topArea, totalPosts }: { topArea: string; totalPosts: numb
           <p className="text-[11px] font-mono text-text-muted uppercase tracking-[0.32em] mb-3">
             OnlySA
           </p>
-          <h1 className="max-w-[11ch] text-4xl sm:text-5xl lg:text-6xl font-display tracking-tight text-text-primary leading-[0.84] mb-4 text-balance">
+          <h1 className="max-w-[10ch] text-4xl sm:text-5xl lg:text-6xl font-display tracking-tight text-text-primary leading-[0.84] mb-4 text-balance">
             For SA<br />
             <span className="text-accent-red">Eyes Only</span>
           </h1>

@@ -23,7 +23,7 @@ export function Navbar({ selectedArea = "All SA", onAreaChange }: NavProps) {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/60">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <span className="text-xl font-display tracking-wider text-text-primary">
