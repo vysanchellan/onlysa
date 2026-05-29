@@ -28,46 +28,28 @@ export default function HomePage() {
         const res = await fetch(`/api/posts?tab=${tab}&area=${encodeURIComponent(area)}`);
         if (res.ok) {
           const data = await res.json();
-          if (!cancelled) {
-            setPosts(data.posts);
-          }
+          if (!cancelled) setPosts(data.posts);
         }
       } catch {
         // handle error
       } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
     }
 
     void fetchPosts();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [tab, area, refreshKey]);
 
-  const handleAreaChange = (nextArea: Area) => {
-    setLoading(true);
-    setArea(nextArea);
-  };
-
-  const handleTabChange = (nextTab: Tab) => {
-    setLoading(true);
-    setTab(nextTab);
-  };
-
-  const handleRefresh = () => {
-    setLoading(true);
-    setRefreshKey((current) => current + 1);
-  };
+  const handleAreaChange = (nextArea: Area) => { setLoading(true); setArea(nextArea); };
+  const handleTabChange  = (nextTab: Tab)  => { setLoading(true); setTab(nextTab); };
+  const handleRefresh    = () => { setLoading(true); setRefreshKey((c) => c + 1); };
 
   const quickAreas: Area[] = ["Umhlanga", "Durban CBD", "Johannesburg", "Cape Town", "Westville"];
   const visiblePosts = posts.slice(0, 6);
-  const areaCounts = posts.reduce<Record<string, number>>((counts, post) => {
-    counts[post.area] = (counts[post.area] || 0) + 1;
-    return counts;
+  const areaCounts   = posts.reduce<Record<string, number>>((acc, p) => {
+    acc[p.area] = (acc[p.area] || 0) + 1;
+    return acc;
   }, {});
   const topArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "All SA";
 
@@ -77,11 +59,16 @@ export default function HomePage() {
 
       <main className="max-w-7xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.75fr)] xl:items-start">
+
+          {/* ── Left column ── */}
           <section className="min-w-0 space-y-4">
+
+            {/* Hero */}
             {area === "All SA" && tab === "recent" && !loading && (
               <HeroBanner topArea={topArea} totalPosts={posts.length} />
             )}
 
+            {/* Area chips + tabs */}
             <div className="overflow-hidden rounded-2xl border border-border/60 bg-bg-card/80 p-4 shadow-[0_20px_80px_rgba(0,0,0,0.2)]">
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
                 <TrendingUp size={12} className="text-accent-red shrink-0" />
@@ -117,12 +104,14 @@ export default function HomePage() {
               )}
             </div>
 
+            {/* Feed */}
             {loading ? (
               <FeedSkeleton />
             ) : posts.length === 0 ? (
               <EmptyFeed />
             ) : (
               <div className="space-y-4">
+                {/* Featured post */}
                 <div className="rounded-3xl border border-border/60 bg-bg-card/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.22)]">
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <div>
@@ -136,7 +125,8 @@ export default function HomePage() {
                   <PostCard post={visiblePosts[0]} className="border-border/80 bg-bg-secondary" />
                 </div>
 
-                <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-2">
+                {/* Grid */}
+                <div className="grid gap-3 lg:grid-cols-2">
                   {visiblePosts.slice(1).map((post, i) => (
                     <Link
                       key={post.id}
@@ -154,39 +144,42 @@ export default function HomePage() {
             {!loading && posts.length > visiblePosts.length && (
               <div className="text-center py-8">
                 <p className="text-[12px] font-mono text-text-muted">
-                  {posts.length - visiblePosts.length} more posts in the feed. <span className="text-accent-red cursor-pointer hover:underline" onClick={handleRefresh}>Refresh</span>
+                  {posts.length - visiblePosts.length} more posts in the feed.{" "}
+                  <span className="text-accent-red cursor-pointer hover:underline" onClick={handleRefresh}>
+                    Refresh
+                  </span>
                 </p>
               </div>
             )}
           </section>
 
-          <aside className="min-w-0 space-y-4 lg:sticky lg:top-20">
+          {/* ── Right sidebar ── */}
+          <aside className="min-w-0 space-y-4 xl:sticky xl:top-20">
+            {/* Live pulse */}
             <div className="rounded-2xl border border-border/60 bg-bg-card p-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.24em] text-text-muted mb-3">
                 Live pulse
               </p>
               <div className="grid grid-cols-2 gap-3">
-                <StatCard label="Posts" value={String(posts.length).padStart(2, "0")} tone="accent-red" />
-                <StatCard label="Active area" value={topArea} tone="text-primary" />
-                <StatCard label="Feed" value={tab.replace("-", " ")} tone="text-secondary" />
-                <StatCard label="Mode" value={area === "All SA" ? "Nationwide" : area} tone="text-secondary" />
+                <StatCard label="Posts"       value={String(posts.length).padStart(2, "0")} tone="text-accent-red" />
+                <StatCard label="Active area" value={topArea}                                tone="text-text-primary" />
+                <StatCard label="Feed"        value={tab.replace("-", " ")}                  tone="text-text-secondary" />
+                <StatCard label="Mode"        value={area === "All SA" ? "Nationwide" : area} tone="text-text-secondary" />
               </div>
             </div>
 
+            {/* What this is */}
             <div className="rounded-2xl border border-border/60 bg-bg-card p-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.24em] text-text-muted mb-3">
                 What this is
               </p>
               <div className="space-y-3 text-sm leading-relaxed text-text-secondary">
-                <p>
-                  Anonymous posts from South Africa, tuned for local confessions, rants, reviews, and city-level opinions.
-                </p>
-                <p>
-                  Use the area chips to narrow the feed, or switch tabs to surface what is hot right now.
-                </p>
+                <p>Anonymous posts from South Africa, tuned for local confessions, rants, reviews, and city-level opinions.</p>
+                <p>Use the area chips to narrow the feed, or switch tabs to surface what is hot right now.</p>
               </div>
             </div>
 
+            {/* Posting flow */}
             <div className="rounded-2xl border border-border/60 bg-bg-card p-5">
               <p className="text-[11px] font-mono uppercase tracking-[0.24em] text-text-muted mb-3">
                 Posting flow
@@ -206,12 +199,15 @@ export default function HomePage() {
   );
 }
 
+/* ── Hero Banner ── */
 function HeroBanner({ topArea, totalPosts }: { topArea: string; totalPosts: number }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(230,57,70,0.14),transparent_30%),linear-gradient(180deg,rgba(20,20,20,0.98),rgba(14,14,14,0.98))] p-6 sm:p-8 lg:p-10 shadow-[0_30px_100px_rgba(0,0,0,0.28)]">
+    <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-[radial-gradient(circle_at_top_left,rgba(230,57,70,0.14),transparent_30%),linear-gradient(180deg,rgba(20,20,20,0.98),rgba(14,14,14,0.98))] p-6 sm:p-8 shadow-[0_30px_100px_rgba(0,0,0,0.28)]">
       <div className="absolute inset-0 bg-[linear-gradient(135deg,transparent,rgba(255,255,255,0.02),transparent)] pointer-events-none" />
-      <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-end">
+
+      <div className="relative grid gap-6 lg:grid-cols-[1fr_220px] lg:items-end">
         <div>
+          {/* Live badge */}
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1.5 h-1.5 rounded-full bg-accent-red animate-pulse" />
             <span className="text-[11px] font-mono text-text-muted uppercase tracking-[0.28em]">
@@ -219,14 +215,14 @@ function HeroBanner({ topArea, totalPosts }: { topArea: string; totalPosts: numb
             </span>
           </div>
 
-          <p className="text-[11px] font-mono text-text-muted uppercase tracking-[0.32em] mb-3">
-            OnlySA
-          </p>
-          <h1 className="max-w-[9ch] text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-display tracking-tight text-text-primary leading-[0.92] mb-4 text-balance">
+          <p className="text-[11px] font-mono text-text-muted uppercase tracking-[0.32em] mb-2">OnlySA</p>
+
+          <h1 className="text-5xl sm:text-6xl font-display tracking-tight text-text-primary leading-[0.9] mb-4">
             For SA<br />
             <span className="text-accent-red">Eyes Only</span>
           </h1>
-          <p className="max-w-xl text-sm sm:text-base text-text-secondary leading-relaxed">
+
+          <p className="max-w-md text-sm text-text-secondary leading-relaxed">
             Anonymous confessions, city rants, reviews, and hot takes from across South Africa. Built to feel local, sharp, and unfiltered.
           </p>
 
@@ -244,8 +240,9 @@ function HeroBanner({ topArea, totalPosts }: { topArea: string; totalPosts: numb
           </div>
         </div>
 
+        {/* Mini panels */}
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-          <MiniPanel title="Browse" body="Use area chips to lock onto a city or jump back to nationwide." />
+          <MiniPanel title="Browse"    body="Use area chips to lock onto a city or jump back to nationwide." />
           <MiniPanel title="Post flow" body="Pick a category, write naturally, then submit without an account." />
         </div>
       </div>
