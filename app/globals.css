@@ -1,0 +1,201 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --bg: #080808;
+  --bg-secondary: #111111;
+  --bg-card: #141414;
+  --bg-elevated: #1C1C1C;
+  --accent-red: #E63946;
+  --accent-orange: #F4531C;
+  --accent-blue: #2563EB;
+  --accent-purple: #7C3AED;
+  --accent-green: #059669;
+  --text-primary: #F0EDE8;
+  --text-secondary: #9A9590;
+  --text-muted: #5A5652;
+  --border: #232323;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+/* Selection */
+::selection {
+  background: rgba(230, 57, 70, 0.3);
+  color: var(--text-primary);
+}
+
+/* Category badge colors */
+.badge-confession { 
+  background: rgba(230, 57, 70, 0.12); 
+  color: #E63946; 
+  border: 1px solid rgba(230, 57, 70, 0.25);
+}
+.badge-rant { 
+  background: rgba(244, 83, 28, 0.12); 
+  color: #F4531C; 
+  border: 1px solid rgba(244, 83, 28, 0.25);
+}
+.badge-review { 
+  background: rgba(37, 99, 235, 0.12); 
+  color: #5B8DEF; 
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+.badge-hot-take { 
+  background: rgba(217, 119, 6, 0.12); 
+  color: #D97706; 
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+.badge-question { 
+  background: rgba(124, 58, 237, 0.12); 
+  color: #A78BFA; 
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+.badge-neighbourhood-watch { 
+  background: rgba(5, 150, 105, 0.12); 
+  color: #10B981; 
+  border: 1px solid rgba(5, 150, 105, 0.25);
+}
+
+/* Noise texture overlay */
+.noise::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* Card hover glow */
+.card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  background: #181818;
+}
+
+/* Skew card effect inspired by the twitter testimonials */
+.skew-card {
+  transform: skewY(-1deg);
+  transition: transform 0.3s ease;
+}
+.skew-card:hover {
+  transform: skewY(0deg);
+}
+
+/* Animated border gradient */
+.border-glow {
+  position: relative;
+}
+.border-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(230,57,70,0.5), transparent, rgba(230,57,70,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Glass effect */
+.glass {
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #F0EDE8 0%, #9A9590 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Line clamp */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Mobile bottom nav safe area */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Upvote button active state */
+.upvote-active {
+  color: var(--accent-red);
+  background: rgba(230, 57, 70, 0.1);
+}
+
+/* Stagger animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Shimmer loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #1C1C1C 25%, #252525 50%, #1C1C1C 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid rgba(230, 57, 70, 0.6);
+  outline-offset: 2px;
+}
+
+/* PWA standalone mode */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+}
