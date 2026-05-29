@@ -64,7 +64,8 @@ export default function RootLayout({
   return (
     <html lang="en-ZA" suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
       </head>
       <body className={`${bebasNeue.variable} ${dmSans.variable} ${jetBrainsMono.variable} noise`}>
         {children}
