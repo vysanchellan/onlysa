@@ -75,8 +75,8 @@ export default function HomePage() {
     <div className="min-h-screen bg-bg">
       <Navbar selectedArea={area} onAreaChange={handleAreaChange} />
 
-      <main className="max-w-6xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_340px] lg:items-start">
+      <main className="max-w-7xl mx-auto px-4 pt-20 pb-24 sm:pb-12">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.75fr)] xl:items-start">
           <section className="min-w-0 space-y-4">
             {area === "All SA" && tab === "recent" && !loading && (
               <HeroBanner topArea={topArea} totalPosts={posts.length} />
@@ -222,7 +222,7 @@ function HeroBanner({ topArea, totalPosts }: { topArea: string; totalPosts: numb
           <p className="text-[11px] font-mono text-text-muted uppercase tracking-[0.32em] mb-3">
             OnlySA
           </p>
-          <h1 className="max-w-[10ch] text-4xl sm:text-5xl lg:text-6xl font-display tracking-tight text-text-primary leading-[0.84] mb-4 text-balance">
+          <h1 className="max-w-[9ch] text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-display tracking-tight text-text-primary leading-[0.92] mb-4 text-balance">
             For SA<br />
             <span className="text-accent-red">Eyes Only</span>
           </h1>

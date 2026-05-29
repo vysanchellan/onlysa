@@ -68,7 +68,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
       </head>
       <body className={`${bebasNeue.variable} ${dmSans.variable} ${jetBrainsMono.variable} noise`}>
-        {children}
+        <div className="relative z-10">{children}</div>
       </body>
     </html>
   );
