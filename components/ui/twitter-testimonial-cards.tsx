@@ -8,7 +8,6 @@ interface TestimonialCardProps {
   handle?: string;
   content?: string;
   date?: string;
-  verified?: boolean;
   likes?: number;
   retweets?: number;
   tweetUrl?: string;
@@ -17,70 +16,109 @@ interface TestimonialCardProps {
   isActive?: boolean;
   onTap?: () => void;
   avatar?: string;
+  area?: string;
+  category?: string;
 }
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-function TwitterIcon() {
-  return (
-    <svg style={{ width:16, height:16 }} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-    </svg>
-  );
-}
+const CAT_COLORS: Record<string, { dot: string }> = {
+  "Rant":                  { dot: "#E87040" },
+  "Confession":            { dot: "#E06070" },
+  "Review":                { dot: "#6AAF88" },
+  "Hot Take":              { dot: "#E8B050" },
+  "Question":              { dot: "#6A90B0" },
+  "Neighbourhood Watch":   { dot: "#A070C0" },
+};
 
-function TestimonialCard({
-  className, username="SA Anonymous", handle="@anonymous",
-  content="This is the most honest I've been on the internet in years.",
-  date="Jan 5, 2026", verified=false, likes=42, retweets=8,
-  tweetUrl="https://onlysa.vercel.app", onHover, onLeave, isActive, onTap, avatar,
+export function TestimonialCard({
+  className, username = "Anonymous", handle = "@anonymous",
+  content = "This is the most honest I've been on the internet in years.",
+  date = "2h ago", likes = 42, retweets = 8,
+  tweetUrl = "#", onHover, onLeave, isActive, onTap, avatar, area, category,
 }: TestimonialCardProps) {
   const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     if (isTouch && !isActive) { e.preventDefault(); onTap?.(); }
   };
 
+  const dot = category ? (CAT_COLORS[category]?.dot ?? "#E87040") : "#E87040";
+
   return (
     <a
       href={tweetUrl} target="_blank" rel="noopener noreferrer"
       onClick={handleClick} onMouseEnter={onHover} onMouseLeave={onLeave}
       className={cn(
-        "relative flex h-auto min-h-[140px] sm:min-h-[180px] w-[260px] sm:w-[380px] -skew-y-[8deg] select-none flex-col rounded-2xl border border-border bg-card/90 backdrop-blur-sm px-3 sm:px-4 py-3 sm:py-4 transition-all duration-500 hover:border-border/80 hover:bg-card cursor-pointer",
-        isActive && "ring-2 ring-primary/50",
+        "relative flex h-auto min-h-[160px] sm:min-h-[200px] w-[280px] sm:w-[400px]",
+        "-skew-y-[6deg] select-none flex-col rounded-2xl cursor-pointer",
+        "transition-all duration-500",
+        isActive && "ring-1 ring-white/20",
         className
       )}
-      style={{ textDecoration:"none" }}
+      style={{
+        background: "rgba(13,13,16,0.92)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        padding: "20px 24px",
+        textDecoration: "none",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
-      <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
-        <div className="size-9 sm:size-12 rounded-full flex items-center justify-center overflow-hidden shrink-0"
-          style={{ background:"linear-gradient(135deg,#FF3B1F,#ff6b47)", width:40, height:40, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, flexShrink:0 }}>
-          {avatar ? <img src={avatar} alt={username} style={{ width:"100%", height:"100%", objectFit:"cover" }} /> : "🇿🇦"}
-        </div>
-        <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <span style={{ fontWeight:700, color:"rgba(255,255,255,0.9)", fontSize:14, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{username}</span>
+      {/* Top row */}
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:14 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          {/* Avatar */}
+          <div style={{
+            width:36, height:36, borderRadius:"50%", flexShrink:0,
+            background:"linear-gradient(135deg, #E8490F, #F06830)",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:14, fontWeight:700, color:"#fff",
+            fontFamily:"'Syne', sans-serif",
+          }}>
+            {username.charAt(0).toUpperCase()}
           </div>
-          <span style={{ color:"rgba(255,255,255,0.4)", fontSize:12 }}>{handle}</span>
+          <div>
+            <div style={{ fontSize:13, fontWeight:600, color:"rgba(242,238,233,0.9)", fontFamily:"'Syne',sans-serif", letterSpacing:"-0.01em" }}>{username}</div>
+            <div style={{ fontSize:11, color:"rgba(160,154,147,0.7)", fontFamily:"'DM Mono',monospace", marginTop:1 }}>{handle}</div>
+          </div>
         </div>
-        <span style={{ color:"rgba(255,255,255,0.5)", flexShrink:0 }}><TwitterIcon /></span>
+        {/* Category dot + area */}
+        <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
+          {category && (
+            <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+              <div style={{ width:5, height:5, borderRadius:"50%", background:dot }} />
+              <span style={{ fontSize:10, fontFamily:"'DM Mono',monospace", color:dot, textTransform:"uppercase", letterSpacing:"0.1em" }}>{category}</span>
+            </div>
+          )}
+          {area && <span style={{ fontSize:10, fontFamily:"'DM Mono',monospace", color:"rgba(160,154,147,0.5)", textTransform:"uppercase", letterSpacing:"0.06em" }}>{area}</span>}
+        </div>
       </div>
-      <p style={{ color:"rgba(255,255,255,0.8)", fontSize:14, lineHeight:1.55, marginBottom:12, display:"-webkit-box", WebkitLineClamp:4, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+
+      {/* Content */}
+      <p style={{
+        fontSize:14, lineHeight:1.6, color:"rgba(242,238,233,0.78)",
+        flex:1, marginBottom:16,
+        display:"-webkit-box", WebkitLineClamp:4, WebkitBoxOrient:"vertical", overflow:"hidden",
+        fontFamily:"'DM Sans',sans-serif", fontWeight:300,
+      }}>
         {content}
       </p>
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", color:"rgba(255,255,255,0.35)", fontSize:12, marginTop:"auto" }}>
-        <span>{date}</span>
+
+      {/* Footer */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <span style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color:"rgba(160,154,147,0.45)" }}>{date}</span>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          <span style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <svg style={{ width:14,height:14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"rgba(160,154,147,0.45)", fontFamily:"'DM Mono',monospace" }}>
+            <svg style={{ width:12,height:12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
             {likes}
           </span>
-          <span style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <svg style={{ width:14,height:14 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+          <span style={{ display:"flex", alignItems:"center", gap:5, fontSize:11, color:"rgba(160,154,147,0.45)", fontFamily:"'DM Mono',monospace" }}>
+            <svg style={{ width:12,height:12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
             </svg>
             {retweets}
           </span>
@@ -100,16 +138,31 @@ export function Testimonials({ cards }: TestimonialsProps) {
 
   const getCardClassName = (index: number, base: string) => {
     const focused = hoveredIndex ?? activeIndex;
-    if (focused === 0 && index === 1) return base + " !translate-y-20 sm:!translate-y-32 !translate-x-14 sm:!translate-x-24";
-    if (focused === 0 && index === 2) return base + " !translate-y-28 sm:!translate-y-44 !translate-x-24 sm:!translate-x-40";
-    if (focused === 1 && index === 2) return base + " !translate-y-24 sm:!translate-y-40 !translate-x-24 sm:!translate-x-40";
+    if (focused === 0 && index === 1) return base + " !translate-y-20 sm:!translate-y-32 !translate-x-12 sm:!translate-x-20";
+    if (focused === 0 && index === 2) return base + " !translate-y-28 sm:!translate-y-44 !translate-x-20 sm:!translate-x-36";
+    if (focused === 1 && index === 2) return base + " !translate-y-24 sm:!translate-y-40 !translate-x-20 sm:!translate-x-36";
     return base;
   };
 
   const defaultCards: TestimonialCardProps[] = [
-    { className:"[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-2xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/60 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-500 hover:grayscale-0 before:left-0 before:top-0", username:"Durban Local", handle:"@durban_anon", content:"The N3 at 7am should be classified as psychological torture. I left home at 6:45 and I'm still watching a bakkie inch forward. That is all. 🚗", date:"2h ago", likes:201, retweets:33 },
-    { className:"[grid-area:stack] translate-x-8 sm:translate-x-16 translate-y-6 sm:translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-2xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/60 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-500 hover:grayscale-0 before:left-0 before:top-0", username:"Umhlanga Resident", handle:"@umhlanga_anon", content:"Umhlanga is just Sandton with a beach view and twice the attitude. R90 coffee and parking costs more than your first car.", date:"5h ago", likes:88, retweets:21 },
-    { className:"[grid-area:stack] translate-x-16 sm:translate-x-32 translate-y-12 sm:translate-y-20 hover:translate-y-6 sm:hover:translate-y-10", username:"Joburg Local", handle:"@joburg_anon", content:"Eskom scheduled maintenance 8am–4pm. Power back off at 8:01am. Back on at 5:47pm. Make it make sense. 🕯️", date:"8h ago", likes:312, retweets:41 },
+    {
+      className:"[grid-area:stack] hover:-translate-y-8 before:absolute before:w-full before:h-full before:rounded-2xl before:content-[''] before:bg-bg/60 hover:before:opacity-0 before:transition-opacity before:duration-400 before:left-0 before:top-0 before:pointer-events-none",
+      username:"Westville Resident", handle:"@westville_za", area:"Westville", category:"Rant",
+      content:"The N3 at 7am should be classified as psychological torture. Left home at 6:45 to beat traffic. Still sitting here watching a bakkie inch forward. That is all.",
+      date:"2h ago", likes:201, retweets:33,
+    },
+    {
+      className:"[grid-area:stack] translate-x-6 sm:translate-x-14 translate-y-5 sm:translate-y-8 hover:-translate-y-2 before:absolute before:w-full before:h-full before:rounded-2xl before:content-[''] before:bg-bg/60 hover:before:opacity-0 before:transition-opacity before:duration-400 before:left-0 before:top-0 before:pointer-events-none",
+      username:"Umhlanga Resident", handle:"@umhlanga_za", area:"Umhlanga", category:"Hot Take",
+      content:"Umhlanga is just Sandton with a beach view and twice the attitude. The coffee is R90 and parking costs more than your first car. But somehow we all keep coming back.",
+      date:"5h ago", likes:88, retweets:21,
+    },
+    {
+      className:"[grid-area:stack] translate-x-12 sm:translate-x-28 translate-y-10 sm:translate-y-16 hover:translate-y-4 sm:hover:translate-y-8",
+      username:"Joburg Local", handle:"@joburg_za", area:"Johannesburg", category:"Rant",
+      content:"Eskom scheduled maintenance 8am–4pm. Power back off at 8:01am. Back on at 5:47pm. Make it make sense.",
+      date:"8h ago", likes:312, retweets:41,
+    },
   ];
 
   const displayCards = cards || defaultCards;
@@ -130,5 +183,4 @@ export function Testimonials({ cards }: TestimonialsProps) {
   );
 }
 
-export { TestimonialCard };
 export type { TestimonialCardProps, TestimonialsProps };
