@@ -1,48 +1,37 @@
-"use client";
-import { getCategoryColor } from "@/lib/utils";
 
-interface BadgeProps {
-  category: string;
-  className?: string;
-}
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
 
-export function CategoryBadge({ category }: BadgeProps) {
-  const { bg, color, border } = getCategoryColor(category);
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <span style={{
-      display: "inline-flex", alignItems: "center",
-      padding: "2px 8px",
-      borderRadius: "4px",
-      fontSize: "11px",
-      fontFamily: "var(--font-mono, monospace)",
-      fontWeight: 500,
-      textTransform: "uppercase",
-      letterSpacing: "0.08em",
-      backgroundColor: bg,
-      color: color,
-      border: `1px solid ${border}`,
-    }}>
-      {category}
-    </span>
-  );
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
 }
 
-interface AreaTagProps {
-  area: string;
-  className?: string;
-}
-
-export function AreaTag({ area }: AreaTagProps) {
-  return (
-    <span style={{
-      display: "inline-flex", alignItems: "center",
-      fontSize: "11px",
-      fontFamily: "var(--font-mono, monospace)",
-      color: "#5A5652",
-      textTransform: "uppercase",
-      letterSpacing: "0.08em",
-    }}>
-      📍 {area}
-    </span>
-  );
-}
+export { Badge, badgeVariants }

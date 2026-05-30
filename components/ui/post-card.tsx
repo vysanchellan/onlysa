@@ -4,8 +4,17 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { MessageCircle, ArrowUp, Share2, Flag } from "lucide-react";
 import { Post } from "@/types";
-import { CategoryBadge, AreaTag } from "./badge";
+import { Badge } from "./badge";
 import { timeAgo, getSessionToken, truncate } from "@/lib/utils";
+
+// Define CategoryBadge and AreaTag here until they are properly placed
+const CategoryBadge = ({ category }: { category: string }) => (
+  <Badge>{category}</Badge>
+);
+
+const AreaTag = ({ area }: { area: string }) => (
+  <Badge>{area}</Badge>
+);
 
 const C = {
   bgCard:    "#141414",

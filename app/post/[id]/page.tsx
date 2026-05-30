@@ -4,9 +4,18 @@ import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Share2, ArrowUp, MessageCircle, Loader2, Send } from "lucide-react";
 import { Post, Comment } from "@/types";
-import { CategoryBadge, AreaTag } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { timeAgo, getSessionToken } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+
+// Define CategoryBadge and AreaTag here until they are properly placed
+const CategoryBadge = ({ category }: { category: string }) => (
+  <Badge>{category}</Badge>
+);
+
+const AreaTag = ({ area }: { area: string }) => (
+  <Badge>{area}</Badge>
+);
 
 export default function PostPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
