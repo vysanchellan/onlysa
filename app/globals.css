@@ -1,74 +1,75 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  * { box-sizing: border-box; }
-  
-  html {
-    color-scheme: dark;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
-  body {
-    background: #070709;
-    color: rgba(255,255,255,0.85);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior-y: none;
-  }
-
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
-
-  ::selection {
-    background: rgba(52,211,153,0.3);
-    color: white;
-  }
-
-  :focus-visible {
-    outline: 2px solid rgba(52,211,153,0.5);
-    outline-offset: 2px;
-    border-radius: 6px;
-  }
+:root {
+  --brand: #FF3B1F;
+  --bg: #080808;
+  --bg-card: #0F0F0F;
+  --border: rgba(255, 255, 255, 0.06);
 }
 
-@layer utilities {
-  .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-
-  .animate-in {
-    animation-fill-mode: both;
-  }
-  
-  .fade-in-0 {
-    animation-name: fadeIn;
-  }
-
-  .slide-in-from-bottom-2 {
-    animation-name: slideInBottom;
-  }
-
-  .zoom-in-95 {
-    animation-name: zoomIn;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  @keyframes slideInBottom {
-    from { transform: translateY(8px); opacity: 0; }
-    to   { transform: translateY(0);   opacity: 1; }
-  }
-
-  @keyframes zoomIn {
-    from { transform: scale(0.95); opacity: 0; }
-    to   { transform: scale(1);    opacity: 1; }
-  }
-
-  .duration-400 { animation-duration: 400ms; }
-  .duration-500 { animation-duration: 500ms; }
-  .duration-700 { animation-duration: 700ms; }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--brand) transparent;
 }
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--brand);
+  border-radius: 20px;
+  border: 3px solid transparent;
+}
+
+::selection {
+    background-color: rgba(255, 59, 31, 0.25);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+/* Tailwind utility overrides */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+.backdrop-blur {
+  backdrop-filter: blur(8px);
+}
+.backdrop-blur-lg {
+  backdrop-filter: blur(16px);
+}
+.backdrop-blur-xl {
+  backdrop-filter: blur(24px);
+}
+
+.bg-card\/90 { background-color: rgba(15, 15, 15, 0.9); }
+.border-border { border-color: var(--border); }
+.text-foreground { color: #ffffff; }
+.text-muted-foreground { color: rgba(255, 255, 255, 0.5); }
+.bg-background { background-color: var(--bg); }
+.text-primary { color: var(--brand); }
+.bg-primary { background-color: var(--brand); }
+.ring-primary\/50 { ring-color: rgba(255, 59, 31, 0.5); }
+.bg-accent { background-color: rgba(255, 255, 255, 0.1); }
