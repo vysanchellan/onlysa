@@ -1,32 +1,53 @@
+const skeletonStyle = {
+  background: "linear-gradient(90deg, #1C1C1C 25%, #252525 50%, #1C1C1C 75%)",
+  backgroundSize: "200% 100%",
+  animation: "skeleton-shimmer 1.5s infinite",
+  borderRadius: "4px",
+};
+
 export function PostSkeleton() {
   return (
-    <div className="bg-bg-card border border-border rounded-xl p-5 animate-pulse">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="h-5 w-20 skeleton rounded" />
-        <div className="h-4 w-24 skeleton rounded" />
-        <div className="h-4 w-12 skeleton rounded ml-auto" />
+    <div style={{
+      backgroundColor: "#141414",
+      border: "1px solid #232323",
+      borderRadius: "12px",
+      padding: "20px",
+    }}>
+      {/* Header row */}
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+        <div style={{ ...skeletonStyle, height: "20px", width: "80px" }} />
+        <div style={{ ...skeletonStyle, height: "16px", width: "96px" }} />
+        <div style={{ ...skeletonStyle, height: "16px", width: "48px", marginLeft: "auto" }} />
       </div>
-      <div className="space-y-2 mb-4">
-        <div className="h-4 w-full skeleton rounded" />
-        <div className="h-4 w-5/6 skeleton rounded" />
-        <div className="h-4 w-4/6 skeleton rounded" />
+      {/* Content lines */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+        <div style={{ ...skeletonStyle, height: "16px", width: "100%" }} />
+        <div style={{ ...skeletonStyle, height: "16px", width: "83%" }} />
+        <div style={{ ...skeletonStyle, height: "16px", width: "67%" }} />
       </div>
-      <div className="h-3 w-28 skeleton rounded mb-4" />
-      <div className="flex gap-2 pt-3 border-t border-border/60">
-        <div className="h-8 w-16 skeleton rounded-lg" />
-        <div className="h-8 w-16 skeleton rounded-lg" />
-        <div className="h-8 w-16 skeleton rounded-lg" />
+      {/* Identity */}
+      <div style={{ ...skeletonStyle, height: "12px", width: "112px", marginBottom: "16px" }} />
+      {/* Actions */}
+      <div style={{ display: "flex", gap: "8px", paddingTop: "12px", borderTop: "1px solid rgba(35,35,35,0.6)" }}>
+        <div style={{ ...skeletonStyle, height: "32px", width: "64px", borderRadius: "8px" }} />
+        <div style={{ ...skeletonStyle, height: "32px", width: "64px", borderRadius: "8px" }} />
+        <div style={{ ...skeletonStyle, height: "32px", width: "64px", borderRadius: "8px" }} />
       </div>
+
+      <style>{`
+        @keyframes skeleton-shimmer {
+          from { background-position: -200% 0; }
+          to   { background-position:  200% 0; }
+        }
+      `}</style>
     </div>
   );
 }
 
 export function FeedSkeleton() {
   return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <PostSkeleton key={i} />
-      ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      {[...Array(5)].map((_, i) => <PostSkeleton key={i} />)}
     </div>
   );
 }
