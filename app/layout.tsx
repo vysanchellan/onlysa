@@ -1,27 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bebas_Neue, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-
-const bebasNeue = Bebas_Neue({
-  subsets: ["latin"],
-  weight: "400",
-  variable: "--font-display",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-body",
-  display: "swap",
-});
-
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "OnlySA — For SA Eyes Only",
@@ -31,20 +9,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: "OnlySA — For SA Eyes Only",
     description: "Anonymous. Unfiltered. SA.",
-    siteName: "OnlySA",
-    locale: "en_ZA",
     type: "website",
+    locale: "en_ZA",
+    siteName: "OnlySA",
   },
   twitter: {
     card: "summary_large_image",
     title: "OnlySA — For SA Eyes Only",
     description: "Anonymous. Unfiltered. SA.",
   },
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "OnlySA",
+  other: {
+    "apple-mobile-web-app-title": "OnlySA",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+    "mobile-web-app-capable": "yes",
   },
 };
 
@@ -53,7 +30,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#080808",
+  themeColor: "#070709",
 };
 
 export default function RootLayout({
@@ -62,13 +39,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-ZA" suppressHydrationWarning>
+    <html lang="en-ZA" className="dark">
       <head>
-        <link rel="icon" href="/icons/icon-192.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
+        {/* Preconnect for Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className={`${bebasNeue.variable} ${dmSans.variable} ${jetBrainsMono.variable} noise`}>
-        <div className="relative z-10">{children}</div>
+      <body
+        className="grain"
+        style={{
+          fontFamily: "var(--font-body)",
+          background: "var(--bg)",
+        }}
+      >
+        {children}
       </body>
     </html>
   );
