@@ -6,19 +6,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const liquidbuttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none",
+  "inline-flex items-center justify-center cursor-pointer gap-2 whitespace-nowrap rounded-full font-medium transition-all disabled:pointer-events-none disabled:opacity-50 outline-none select-none",
   {
     variants: {
       variant: {
-        default: "bg-transparent hover:scale-105 duration-300 text-white",
+        default: "text-white hover:scale-[1.03] active:scale-[0.98] duration-300",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 text-xs px-4",
-        lg: "h-10 px-6",
-        xl: "h-12 px-8",
-        xxl: "h-14 px-10 text-base",
-        icon: "size-9",
+        sm:      "h-9 px-6 text-sm",
+        default: "h-11 px-8 text-sm",
+        lg:      "h-13 px-10 text-base",
+        xl:      "h-14 px-12 text-base",
+        xxl:     "h-16 px-14 text-lg tracking-wide",
+        icon:    "size-11",
       },
     },
     defaultVariants: { variant: "default", size: "xxl" },
@@ -29,41 +29,44 @@ export function LiquidButton({
   className, variant, size, asChild = false, children, ...props
 }: React.ComponentProps<"button"> & VariantProps<typeof liquidbuttonVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot : "button"
-
   return (
     <>
-      <Comp
-        className={cn("relative", liquidbuttonVariants({ variant, size, className }))}
-        {...props}
-      >
-        {/* Glass orb shadow layer */}
-        <div style={{
+      <Comp className={cn("relative group", liquidbuttonVariants({ variant, size, className }))} {...props}>
+        {/* Outer glass ring */}
+        <span style={{
           position:"absolute", inset:0, borderRadius:"9999px",
-          boxShadow:`0 0 6px rgba(0,0,0,0.03),
-            0 2px 6px rgba(0,0,0,0.08),
-            inset 3px 3px 0.5px -3px rgba(255,255,255,0.3),
-            inset -3px -3px 0.5px -3px rgba(255,255,255,0.85),
-            inset 1px 1px 1px -0.5px rgba(255,255,255,0.6),
-            inset -1px -1px 1px -0.5px rgba(255,255,255,0.6),
-            inset 0 0 6px 6px rgba(255,255,255,0.08),
-            inset 0 0 2px 2px rgba(255,255,255,0.04),
-            0 0 20px rgba(255,59,31,0.2)`,
-          background:"rgba(255,255,255,0.05)",
-          border:"1px solid rgba(255,255,255,0.15)",
-          transition:"all 0.3s",
+          background:"linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.08) 100%)",
+          border:"1px solid rgba(255,255,255,0.18)",
+          boxShadow:`
+            0 0 0 1px rgba(255,255,255,0.06),
+            0 2px 8px rgba(0,0,0,0.25),
+            0 8px 32px rgba(0,0,0,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.14),
+            inset 0 -1px 0 rgba(0,0,0,0.2),
+            0 0 60px rgba(232,73,15,0.12)
+          `,
+          transition:"all 0.3s ease",
           zIndex:0,
         }} />
-        {/* Backdrop distortion */}
-        <div style={{
-          position:"absolute", inset:0, borderRadius:"9999px",
-          backdropFilter:'url("#container-glass") blur(4px)',
-          WebkitBackdropFilter:'blur(4px)',
-          zIndex:-1, overflow:"hidden",
+        {/* Frosted inner layer */}
+        <span style={{
+          position:"absolute", inset:"1px", borderRadius:"9999px",
+          backdropFilter:"blur(12px) saturate(1.5)",
+          WebkitBackdropFilter:"blur(12px) saturate(1.5)",
+          background:"rgba(255,255,255,0.04)",
+          zIndex:-1,
+        }} />
+        {/* Highlight arc */}
+        <span style={{
+          position:"absolute", top:1, left:"10%", right:"10%", height:"40%",
+          borderRadius:"9999px 9999px 0 0",
+          background:"linear-gradient(180deg, rgba(255,255,255,0.12), transparent)",
+          zIndex:1, pointerEvents:"none",
         }} />
         {/* Content */}
-        <div style={{ position:"relative", zIndex:10, pointerEvents:"none" }}>
+        <span style={{ position:"relative", zIndex:2, display:"flex", alignItems:"center", gap:8 }}>
           {children}
-        </div>
+        </span>
         <GlassFilter />
       </Comp>
     </>
@@ -72,14 +75,14 @@ export function LiquidButton({
 
 function GlassFilter() {
   return (
-    <svg style={{ display:"none" }}>
+    <svg style={{ display:"none", position:"absolute" }} aria-hidden="true">
       <defs>
-        <filter id="container-glass" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.05 0.05" numOctaves="1" seed="1" result="turbulence"/>
-          <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
-          <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="70" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
-          <feGaussianBlur in="displaced" stdDeviation="4" result="finalBlur"/>
-          <feComposite in="finalBlur" in2="finalBlur" operator="over"/>
+        <filter id="liquid-glass" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04 0.04" numOctaves="2" seed="2" result="noise"/>
+          <feGaussianBlur in="noise" stdDeviation="1.5" result="blur"/>
+          <feDisplacementMap in="SourceGraphic" in2="blur" scale="8" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+          <feGaussianBlur in="displaced" stdDeviation="1" result="final"/>
+          <feComposite in="final" in2="SourceGraphic" operator="over"/>
         </filter>
       </defs>
     </svg>
