@@ -2,129 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Custom fonts ──────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+@layer base {
+  * { box-sizing: border-box; }
+  
+  html {
+    color-scheme: dark;
+  }
 
-/* ── Design tokens ─────────────────────────────────────────────────────────── */
-:root {
-  --bg:             #070709;
-  --surface:        rgba(255,255,255,0.04);
-  --border:         rgba(255,255,255,0.08);
-  --border-hover:   rgba(255,255,255,0.16);
-  --text:           rgba(255,255,255,0.85);
-  --text-muted:     rgba(255,255,255,0.35);
-  --text-dim:       rgba(255,255,255,0.20);
-  --accent:         #34d399;
-  --accent-dim:     rgba(52,211,153,0.15);
-  --accent-cyan:    #22d3ee;
-  --font-display:   'Syne', sans-serif;
-  --font-body:      'DM Sans', sans-serif;
-  --font-mono:      'IBM Plex Mono', monospace;
+  body {
+    background: #070709;
+    color: rgba(255,255,255,0.85);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+  }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+  ::selection {
+    background: rgba(52,211,153,0.3);
+    color: white;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgba(52,211,153,0.5);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 }
 
-/* ── Base ──────────────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
+@layer utilities {
+  .scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-html { color-scheme: dark; }
+  .animate-in {
+    animation-fill-mode: both;
+  }
+  
+  .fade-in-0 {
+    animation-name: fadeIn;
+  }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior-y: none;
-}
+  .slide-in-from-bottom-2 {
+    animation-name: slideInBottom;
+  }
 
-/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  .zoom-in-95 {
+    animation-name: zoomIn;
+  }
 
-/* Utility to hide scrollbar while preserving scroll */
-.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }
-.scrollbar-hide::-webkit-scrollbar { display: none; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 
-/* ── Typography ────────────────────────────────────────────────────────────── */
-h1, h2, h3, h4, h5 {
-  font-family: var(--font-display);
-  letter-spacing: -0.02em;
-}
+  @keyframes slideInBottom {
+    from { transform: translateY(8px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
+  }
 
-code, pre, .font-mono {
-  font-family: var(--font-mono);
-}
+  @keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
 
-/* ── Animations ────────────────────────────────────────────────────────────── */
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-
-@keyframes ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
-}
-
-@keyframes shimmer {
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-6px); }
-}
-
-.animate-pulse   { animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite; }
-.animate-ping    { animation: ping  1s cubic-bezier(0,0,0.2,1) infinite; }
-.animate-shimmer { animation: shimmer 2s linear infinite; }
-.animate-float   { animation: float 4s ease-in-out infinite; }
-
-/* ── Liquid-glass surface ──────────────────────────────────────────────────── */
-.glass {
-  background: rgba(255,255,255,0.04);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 1rem;
-}
-
-.glass-strong {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-/* ── Twitter-card skew ─────────────────────────────────────────────────────── */
-.card-skew {
-  transform: skewY(-1deg);
-  transition: transform 0.3s ease;
-}
-.card-skew:hover {
-  transform: skewY(0deg) scale(1.01);
-}
-
-/* ── Grain overlay ─────────────────────────────────────────────────────────── */
-.grain::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px;
-  z-index: 9999;
-}
-
-/* ── Focus ring ────────────────────────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid rgba(52,211,153,0.5);
-  outline-offset: 2px;
-  border-radius: 6px;
-}
-
-/* ── Selection ─────────────────────────────────────────────────────────────── */
-::selection {
-  background: rgba(52,211,153,0.25);
-  color: white;
+  .duration-400 { animation-duration: 400ms; }
+  .duration-500 { animation-duration: 500ms; }
+  .duration-700 { animation-duration: 700ms; }
 }
