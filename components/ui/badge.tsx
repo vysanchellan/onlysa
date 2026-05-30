@@ -1,20 +1,27 @@
 "use client";
-import { cn, getCategoryClass } from "@/lib/utils";
+import { getCategoryColor } from "@/lib/utils";
 
 interface BadgeProps {
   category: string;
   className?: string;
 }
 
-export function CategoryBadge({ category, className }: BadgeProps) {
+export function CategoryBadge({ category }: BadgeProps) {
+  const { bg, color, border } = getCategoryColor(category);
   return (
-    <span
-      className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium uppercase tracking-wider",
-        getCategoryClass(category),
-        className
-      )}
-    >
+    <span style={{
+      display: "inline-flex", alignItems: "center",
+      padding: "2px 8px",
+      borderRadius: "4px",
+      fontSize: "11px",
+      fontFamily: "var(--font-mono, monospace)",
+      fontWeight: 500,
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+      backgroundColor: bg,
+      color: color,
+      border: `1px solid ${border}`,
+    }}>
       {category}
     </span>
   );
@@ -25,14 +32,16 @@ interface AreaTagProps {
   className?: string;
 }
 
-export function AreaTag({ area, className }: AreaTagProps) {
+export function AreaTag({ area }: AreaTagProps) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center text-[11px] font-mono text-text-muted uppercase tracking-wider",
-        className
-      )}
-    >
+    <span style={{
+      display: "inline-flex", alignItems: "center",
+      fontSize: "11px",
+      fontFamily: "var(--font-mono, monospace)",
+      color: "#5A5652",
+      textTransform: "uppercase",
+      letterSpacing: "0.08em",
+    }}>
       📍 {area}
     </span>
   );
