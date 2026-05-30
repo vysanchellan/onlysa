@@ -1,5 +1,5 @@
-import { Component } from "@/components/ui/twitter-testimonial-cards";
+import { Testimonials } from "@/components/ui/twitter-testimonial-cards";
 
 export default function DemoOne() {
-  return <Component />;
+  return <Testimonials />;
 }
