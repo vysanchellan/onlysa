@@ -1,5 +1,29 @@
 import type { Metadata, Viewport } from "next";
+import { Syne } from "next/font/google";
+import { DM_Sans } from "next/font/google";
+import { IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-syne",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+  variable: "--font-dm",
+  display: "swap",
+});
+
+const ibmMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "OnlySA — For SA Eyes Only",
@@ -39,23 +63,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-ZA" className="dark">
-      <head>
-        {/* Preconnect for Google Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        className="grain"
-        style={{
-          fontFamily: "var(--font-body)",
-          background: "var(--bg)",
-        }}
-      >
+    <html
+      lang="en-ZA"
+      className={`dark ${syne.variable} ${dmSans.variable} ${ibmMono.variable}`}
+    >
+      <body className="bg-[#070709] text-white" style={{ fontFamily: "var(--font-dm, 'DM Sans', sans-serif)" }}>
         {children}
       </body>
     </html>
