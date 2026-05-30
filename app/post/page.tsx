@@ -1,299 +1,270 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, PenLine, Loader2, CheckCircle, XCircle } from "lucide-react";
-import { AREAS, CATEGORIES, getSessionToken, cn } from "@/lib/utils";
 
-type PostState = "idle" | "reviewing" | "success" | "error";
+const AREAS = [
+  "Durban CBD", "Umhlanga", "Westville", "Ballito", "PMB",
+  "Richards Bay", "Berea", "Musgrave", "Johannesburg", "Cape Town",
+];
+
+const CATEGORIES = [
+  { id: "Confession",         emoji: "🤫", desc: "Something you can't say IRL" },
+  { id: "Rant",               emoji: "😤", desc: "Let it out" },
+  { id: "Review",             emoji: "⭐", desc: "Place, business, or service" },
+  { id: "Hot Take",           emoji: "🔥", desc: "Controversial opinion" },
+  { id: "Question",           emoji: "❓", desc: "Ask the city" },
+  { id: "Neighbourhood Watch",emoji: "👀", desc: "Something locals should know" },
+];
+
+const MAX = 500;
 
 export default function PostPage() {
   const router = useRouter();
-  const [area, setArea]         = useState("");
-  const [category, setCategory] = useState("");
-  const [content, setContent]   = useState("");
-  const [state, setState]       = useState<PostState>("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const textRef = useRef<HTMLTextAreaElement>(null);
 
-  const maxChars  = 500;
-  const remaining = maxChars - content.length;
-  const isValid   = area && category && content.trim().length >= 10;
+  const [area, setArea]           = useState("");
+  const [category, setCategory]   = useState("");
+  const [content, setContent]     = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone]           = useState(false);
+  const [error, setError]         = useState("");
+  const [mounted, setMounted]     = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!isValid || state === "reviewing") return;
-    setState("reviewing");
-    setErrorMsg("");
-    const sessionToken = getSessionToken();
+  useEffect(() => { setMounted(true); }, []);
+
+  const remaining = MAX - content.length;
+  const canSubmit = area && category && content.trim().length >= 10 && !submitting;
+
+  async function handleSubmit() {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    setError("");
     try {
-      const moderateRes = await fetch("/api/moderate", {
+      const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ area, category, content }),
       });
-      if (moderateRes.ok) {
-        const mod = await moderateRes.json();
-        if (!mod.approved) { setState("error"); setErrorMsg(mod.reason || "Post flagged."); return; }
-        if (mod.category_suggestion) setCategory(mod.category_suggestion);
-      }
-      const postRes = await fetch("/api/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ area, category, content, sessionToken }),
-      });
-      if (postRes.ok) { setState("success"); setTimeout(() => router.push("/"), 2500); }
-      else { setState("error"); setErrorMsg("Something went wrong. Try again."); }
+      if (!res.ok) throw new Error("Failed");
+      setDone(true);
     } catch {
-      setState("error");
-      setErrorMsg("Network error. Check your connection.");
+      setError("Something went wrong. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  if (state === "success") return <SuccessScreen />;
-  if (state === "error")   return <ErrorScreen message={errorMsg} onRetry={() => setState("idle")} />;
-
-  return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#080808" }}>
-
-      {/* Navbar */}
-      <header style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 50,
-        backdropFilter: "blur(16px) saturate(1.2)",
-        WebkitBackdropFilter: "blur(16px) saturate(1.2)",
-        backgroundColor: "rgba(10,10,10,0.85)",
-        borderBottom: "1px solid rgba(35,35,35,0.6)",
-      }}>
-        <div style={{ maxWidth: "672px", margin: "0 auto", padding: "0 16px", height: "56px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <Link href="/" style={{
-            padding: "6px", borderRadius: "8px",
-            color: "#5A5652", textDecoration: "none", display: "flex", alignItems: "center",
-          }}>
-            <ArrowLeft size={18} />
-          </Link>
-          <span style={{ fontFamily: "var(--font-display, 'Bebas Neue', sans-serif)", fontSize: "18px", letterSpacing: "0.08em", color: "#F0EDE8" }}>
-            Only<span style={{ color: "#E63946" }}>SA</span>
-          </span>
-          <span style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "14px", color: "#5A5652" }}>/ Post</span>
+  // ── Success screen ──────────────────────────────────────────────────────────
+  if (done) {
+    return (
+      <div className="min-h-screen bg-[#070709] flex flex-col items-center justify-center px-4 text-white">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[140px]" />
         </div>
-      </header>
+        <div className="relative text-center max-w-sm animate-in fade-in-0 zoom-in-95 duration-500">
+          <div className="text-6xl mb-4">🇿🇦</div>
+          <h2 className="text-2xl font-bold mb-2">Posted.</h2>
+          <p className="text-white/40 text-sm mb-8 leading-relaxed">
+            Your post is in the queue. It&apos;ll go live once reviewed. Anonymous, always.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Link href="/">
+              <button className="rounded-full px-6 py-2.5 text-sm font-semibold bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 transition-all">
+                View Feed
+              </button>
+            </Link>
+            <button
+              onClick={() => { setDone(false); setContent(""); setArea(""); setCategory(""); }}
+              className="rounded-full px-6 py-2.5 text-sm font-semibold bg-white/6 border border-white/12 text-white/60 hover:bg-white/10 transition-all"
+            >
+              Post Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-      <main style={{ maxWidth: "672px", margin: "0 auto", padding: "96px 16px 96px" }}>
+  // ── Form ────────────────────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-[#070709] text-white font-[family-name:var(--font-body)]">
+
+      {/* Ambient */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-[400px] h-[300px] rounded-full bg-cyan-500/6 blur-[120px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] rounded-full bg-emerald-500/6 blur-[120px]" />
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='1' fill='white'/%3E%3C/svg%3E\")" }}
+        />
+      </div>
+
+      {/* Nav */}
+      <nav className="sticky top-0 z-50 border-b border-white/8 bg-[#070709]/80 backdrop-blur-xl">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center gap-3">
+          <Link href="/" className="text-white/40 hover:text-white/80 transition-colors">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+          </Link>
+          <span className="text-sm font-medium text-white/60">OnlySA</span>
+          <span className="text-white/20">/</span>
+          <span className="text-sm text-white/90 font-medium">Post</span>
+        </div>
+      </nav>
+
+      <main className="max-w-2xl mx-auto px-4 py-10">
 
         {/* Heading */}
-        <div style={{ marginBottom: "32px" }}>
-          <h1 style={{
-            fontFamily: "var(--font-display, 'Bebas Neue', sans-serif)",
-            fontSize: "clamp(48px, 10vw, 72px)",
-            letterSpacing: "0.04em",
-            color: "#F0EDE8",
-            lineHeight: 1,
-            marginBottom: "8px",
-          }}>
+        <div className={`mb-10 transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
             Say Something
           </h1>
-          <p style={{ fontSize: "14px", color: "#9A9590", lineHeight: 1.6 }}>
-            No name. No email. No account. Just your unfiltered truth.
-          </p>
+          <p className="text-white/35 text-sm">No name. No email. No account. Just your unfiltered truth.</p>
+
+          {/* Anonymous badge */}
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-3 py-1.5 text-[11px] text-white/40 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            Identity is never stored
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="space-y-6">
 
-          {/* Area */}
-          <FormSection label="Your Area" required>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              {AREAS.filter(a => a !== "All SA").map(a => (
-                <ChipButton key={a} label={a} active={area === a} onClick={() => setArea(a)} />
+          {/* Step 1 — Area */}
+          <section
+            className={`transition-all duration-700 delay-100 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
+          >
+            <label className="block text-[11px] font-mono text-white/35 uppercase tracking-widest mb-3">
+              01 · Your Area
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {AREAS.map(a => (
+                <button
+                  key={a}
+                  type="button"
+                  onClick={() => setArea(a)}
+                  className={`rounded-full px-3.5 py-1.5 text-[12px] font-mono border transition-all duration-200 ${
+                    area === a
+                      ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-300"
+                      : "bg-white/4 border-white/10 text-white/40 hover:bg-white/8 hover:text-white/70"
+                  }`}
+                >
+                  {a}
+                </button>
               ))}
             </div>
-          </FormSection>
+          </section>
 
-          {/* Category */}
-          <FormSection label="Category" required>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-              {CATEGORIES.map(cat => (
-                <ChipButton key={cat} label={cat} active={category === cat} onClick={() => setCategory(cat)} />
+          {/* Step 2 — Category */}
+          <section
+            className={`transition-all duration-700 delay-200 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
+          >
+            <label className="block text-[11px] font-mono text-white/35 uppercase tracking-widest mb-3">
+              02 · Category
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {CATEGORIES.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setCategory(c.id)}
+                  className={`group relative rounded-xl border px-3 py-3 text-left transition-all duration-200 ${
+                    category === c.id
+                      ? "bg-emerald-500/12 border-emerald-500/40 shadow-[0_0_16px_rgba(52,211,153,0.08)]"
+                      : "bg-white/3 border-white/8 hover:bg-white/6 hover:border-white/15"
+                  }`}
+                >
+                  <span className="text-lg block mb-1">{c.emoji}</span>
+                  <span className={`text-[12px] font-semibold block ${category === c.id ? "text-emerald-300" : "text-white/70"}`}>
+                    {c.id}
+                  </span>
+                  <span className="text-[10px] text-white/25">{c.desc}</span>
+                </button>
               ))}
             </div>
-          </FormSection>
+          </section>
 
-          {/* Textarea */}
-          <FormSection label="Your Post" required>
-            <div style={{ position: "relative" }}>
+          {/* Step 3 — Content */}
+          <section
+            className={`transition-all duration-700 delay-300 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}
+          >
+            <label className="block text-[11px] font-mono text-white/35 uppercase tracking-widest mb-3">
+              03 · Your Post
+            </label>
+            <div className="relative">
               <textarea
+                ref={textRef}
                 value={content}
-                onChange={e => setContent(e.target.value.slice(0, maxChars))}
-                placeholder="What's on your mind? This is your space. Be real."
-                rows={6}
-                style={{
-                  width: "100%",
-                  backgroundColor: "#141414",
-                  border: `1px solid ${remaining < 20 ? "#E63946" : remaining < 50 ? "#F4531C" : "#232323"}`,
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  color: "#F0EDE8",
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                  resize: "none",
-                  outline: "none",
-                  fontFamily: "inherit",
-                  boxSizing: "border-box",
-                  transition: "border-color 0.2s",
-                }}
+                onChange={e => { if (e.target.value.length <= MAX) setContent(e.target.value); }}
+                placeholder="Write your confession, rant, review or hot take..."
+                rows={5}
+                className="w-full rounded-2xl border border-white/10 bg-white/4 backdrop-blur-sm px-4 py-4 text-[14px] text-white/85 placeholder:text-white/20 resize-none outline-none transition-all duration-200 focus:border-emerald-500/40 focus:bg-white/6 focus:shadow-[0_0_24px_rgba(52,211,153,0.08)]"
               />
-              <span style={{
-                position: "absolute", bottom: "12px", right: "12px",
-                fontSize: "11px", fontFamily: "var(--font-mono, monospace)",
-                color: remaining < 20 ? "#E63946" : remaining < 50 ? "#F4531C" : "#5A5652",
-              }}>
+              <div className={`absolute bottom-3 right-3 text-[11px] font-mono transition-colors ${remaining < 50 ? "text-red-400" : "text-white/20"}`}>
                 {remaining}
-              </span>
+              </div>
             </div>
-          </FormSection>
+          </section>
 
-          {/* Privacy note */}
-          <div style={{
-            display: "flex", alignItems: "flex-start", gap: "10px",
-            padding: "14px 16px",
-            backgroundColor: "#1C1C1C",
-            border: "1px solid rgba(35,35,35,0.6)",
-            borderRadius: "12px",
-          }}>
-            <div style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#059669", marginTop: "6px", flexShrink: 0 }} />
-            <p style={{ fontSize: "12px", fontFamily: "var(--font-mono, monospace)", color: "#5A5652", lineHeight: "1.6" }}>
-              Your identity is never stored. A random label like &ldquo;Durban Local&rdquo; is assigned automatically. All posts are reviewed before publishing.
+          {/* Error */}
+          {error && (
+            <p className="text-red-400 text-[12px] font-mono border border-red-500/20 bg-red-500/8 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
+
+          {/* Submit */}
+          <div className={`transition-all duration-700 delay-400 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"}`}>
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className={`relative w-full rounded-2xl py-4 text-[15px] font-semibold transition-all duration-300 overflow-hidden ${
+                canSubmit
+                  ? "text-white hover:scale-[1.01] active:scale-[0.99]"
+                  : "opacity-35 cursor-not-allowed text-white/50"
+              }`}
+              style={canSubmit ? {
+                background: "linear-gradient(135deg, rgba(52,211,153,0.25) 0%, rgba(6,182,212,0.15) 100%)",
+                boxShadow: "0 0 6px rgba(0,0,0,0.03),0 2px 6px rgba(0,0,0,0.08),inset 1px 1px 1px rgba(255,255,255,0.1),inset -1px -1px 1px rgba(0,0,0,0.2),0 0 30px rgba(52,211,153,0.1)",
+                border: "1px solid rgba(52,211,153,0.3)",
+              } : {
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}
+            >
+              {/* Liquid glass inner glow layer */}
+              {canSubmit && (
+                <div
+                  className="absolute top-0 left-0 w-full h-full rounded-2xl"
+                  style={{ backdropFilter: "blur(2px)" }}
+                />
+              )}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/>
+                    </svg>
+                    Posting…
+                  </>
+                ) : (
+                  <>
+                    <span>🇿🇦</span> Post Anonymously
+                  </>
+                )}
+              </span>
+            </button>
+
+            <p className="mt-3 text-[11px] text-white/20 text-center font-mono">
+              A random label like &quot;Durban Local&quot; is assigned · No IP stored · Reviewed before live
             </p>
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={!isValid || state === "reviewing"}
-            style={{
-              width: "100%",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-              padding: "14px",
-              backgroundColor: isValid ? "#E63946" : "#1C1C1C",
-              color: isValid ? "#fff" : "#5A5652",
-              border: isValid ? "none" : "1px solid #232323",
-              borderRadius: "12px",
-              fontSize: "14px", fontWeight: 600,
-              cursor: isValid ? "pointer" : "not-allowed",
-              boxShadow: isValid ? "0 8px 24px rgba(230,57,70,0.25)" : "none",
-              transition: "all 0.2s",
-            }}
-          >
-            {state === "reviewing" ? (
-              <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Checking your post...</>
-            ) : (
-              <><PenLine size={16} /> Post Anonymously</>
-            )}
-          </button>
-        </form>
+        </div>
       </main>
-
-      <style>{`
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        textarea:focus { border-color: rgba(230,57,70,0.5) !important; }
-        textarea::placeholder { color: rgba(90,86,82,0.5); }
-      `}</style>
-    </div>
-  );
-}
-
-/* ── Reusable form bits ── */
-function FormSection({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      <label style={{
-        fontSize: "11px", fontFamily: "var(--font-mono, monospace)",
-        color: "#5A5652", textTransform: "uppercase", letterSpacing: "0.12em",
-        display: "block",
-      }}>
-        {label} {required && <span style={{ color: "#E63946" }}>*</span>}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-function ChipButton({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        padding: "6px 12px",
-        borderRadius: "8px",
-        fontSize: "12px",
-        fontFamily: "var(--font-mono, monospace)",
-        border: `1px solid ${active ? "#E63946" : "#232323"}`,
-        backgroundColor: active ? "rgba(230,57,70,0.1)" : "#1C1C1C",
-        color: active ? "#E63946" : "#5A5652",
-        cursor: "pointer",
-        transition: "all 0.15s",
-      }}
-    >
-      {label}
-    </button>
-  );
-}
-
-/* ── Success / Error screens ── */
-function SuccessScreen() {
-  return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#080808", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ textAlign: "center", maxWidth: "360px" }}>
-        <div style={{
-          width: "64px", height: "64px", borderRadius: "50%",
-          backgroundColor: "rgba(5,150,105,0.1)", border: "1px solid rgba(5,150,105,0.3)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 24px",
-        }}>
-          <CheckCircle size={32} style={{ color: "#059669" }} />
-        </div>
-        <h2 style={{ fontFamily: "var(--font-display, 'Bebas Neue', sans-serif)", fontSize: "48px", color: "#F0EDE8", letterSpacing: "0.04em", marginBottom: "12px" }}>
-          It&apos;s Live
-        </h2>
-        <p style={{ fontSize: "14px", color: "#9A9590", lineHeight: 1.6 }}>Your post is live. No name. No face. Just truth.</p>
-        <p style={{ fontFamily: "var(--font-mono, monospace)", fontSize: "12px", color: "#5A5652", marginTop: "16px" }}>Redirecting to feed...</p>
-      </div>
-    </div>
-  );
-}
-
-function ErrorScreen({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#080808", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-      <div style={{ textAlign: "center", maxWidth: "360px" }}>
-        <div style={{
-          width: "64px", height: "64px", borderRadius: "50%",
-          backgroundColor: "rgba(230,57,70,0.1)", border: "1px solid rgba(230,57,70,0.3)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          margin: "0 auto 24px",
-        }}>
-          <XCircle size={32} style={{ color: "#E63946" }} />
-        </div>
-        <h2 style={{ fontFamily: "var(--font-display, 'Bebas Neue', sans-serif)", fontSize: "48px", color: "#F0EDE8", letterSpacing: "0.04em", marginBottom: "12px" }}>
-          Post Flagged
-        </h2>
-        <p style={{ fontSize: "14px", color: "#9A9590", lineHeight: 1.6, marginBottom: "24px" }}>
-          {message || "Your post was flagged. Please review our community guidelines."}
-        </p>
-        <button
-          onClick={onRetry}
-          style={{
-            padding: "10px 24px",
-            backgroundColor: "#1C1C1C", border: "1px solid #232323",
-            color: "#F0EDE8", fontSize: "14px",
-            fontFamily: "var(--font-mono, monospace)",
-            borderRadius: "12px", cursor: "pointer",
-          }}
-        >
-          Try again
-        </button>
-      </div>
     </div>
   );
 }
